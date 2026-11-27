@@ -8,7 +8,6 @@
 //! and squashed without parent/child scale skew. Bind rotations are identity,
 //! hence an inverse bind pose is a plain translation by `-BIND[j]`.
 
-#[cfg(test)]
 use bevy::math::Mat4;
 use bevy::math::{Mat3, Quat, Vec3};
 
@@ -230,7 +229,6 @@ impl Default for JointXf {
 }
 
 impl JointXf {
-    #[cfg(test)]
     pub fn matrix(&self) -> Mat4 {
         Mat4::from_scale_rotation_translation(self.scale, self.rot, self.pos)
     }
@@ -265,8 +263,8 @@ impl Pose {
         &mut self.0[j.i()]
     }
 
-    /// Skinning matrix of a joint (joint transform × inverse bind).
-    #[cfg(test)]
+    /// Skinning matrix of a joint (joint transform × inverse bind), as the GPU
+    /// applies it: lets callers check the skinned mesh on the CPU.
     pub fn skin_matrix(&self, j: usize) -> Mat4 {
         self.0[j].matrix() * Mat4::from_translation(-BIND[j])
     }

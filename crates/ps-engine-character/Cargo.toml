@@ -1,0 +1,16 @@
+[package]
+name = "ps-engine-character"
+description = "Project S engine: procedural liquid-paint humanoids for Bevy (rig, mesh, animation, toon material, effects)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+bevy.workspace = true
+serde.workspace = true
+
+[lints]
+workspace = true

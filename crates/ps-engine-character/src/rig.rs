@@ -2,7 +2,7 @@
 //! the glTF export.
 //!
 //! Units are game units (1 u = 2.54 cm), axes are those of the hitboxes
-//! (`engine_hitreg`): x right, y up, z backward (forward is -z). The skeleton is
+//! (`ps_hitreg`): x right, y up, z backward (forward is -z). The skeleton is
 //! *flat*: every joint is posed in model space and every joint entity is a
 //! direct child of the model root, so poses can be blended, collapsed (death)
 //! and squashed without parent/child scale skew. Bind rotations are identity,

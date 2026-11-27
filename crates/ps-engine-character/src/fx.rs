@@ -294,13 +294,13 @@ pub fn update_fx(
 pub struct Rng(pub u32);
 
 impl Rng {
-    pub fn next(&mut self) -> f32 {
+    pub fn next_unit(&mut self) -> f32 {
         self.0 = self.0.wrapping_mul(1_664_525).wrapping_add(1_013_904_223);
         mesh::hash01(self.0)
     }
 
     pub fn range(&mut self, a: f32, b: f32) -> f32 {
-        a + (b - a) * self.next()
+        a + (b - a) * self.next_unit()
     }
 
     /// Random unit vector, biased toward `dir` by `bias` (0..1).

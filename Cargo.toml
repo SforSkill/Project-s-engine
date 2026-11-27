@@ -1,0 +1,28 @@
+[workspace]
+resolver = "3"
+members = ["crates/ps-engine-character"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.90"
+license = "LicenseRef-Proprietary"
+publish = false
+repository = "https://github.com/SforSkill/Project-s-engine"
+
+[workspace.dependencies]
+bevy = { version = "0.20.1", default-features = false, features = ["std", "3d_bevy_render"] }
+serde = { version = "1", features = ["derive"] }
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[workspace.lints.rust]
+unsafe_code = "deny"
+
+[workspace.lints.clippy]
+too_many_arguments = "allow"
+type_complexity = "allow"

@@ -1,0 +1,4 @@
+# Generic FPS engine: knows nothing about Project S rules, accounts or network.
+[rules."*"]
+forbid = ["ps-types", "ps-sim*", "ps-physics", "ps-movement", "ps-weapons", "ps-hitreg", "ps-rules", "ps-transport", "ps-replay", "ps-core-protocol", "ps-server", "ps-visibility", "ps-netclient", "sqlx*", "postgres*", "reqwest*", "axum*"]
+internal = []

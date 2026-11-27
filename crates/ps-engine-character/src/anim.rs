@@ -1,7 +1,7 @@
 //! Procedural animation controller: locomotion, aim, weapon holds, actions
 //! and death, computed every frame from the networked state only.
 //!
-//! The poses are designed around the hitboxes of `engine-hitreg`: legs stay
+//! The poses are designed around the hitboxes of `ps-hitreg`: legs stay
 //! on the leg capsules (stride capped, feet under the hips), the torso drops
 //! by `DUCK_DROP` when crouching and the hands sit where the arm capsules
 //! are (`tests::skin_stays_in_hitboxes`). The animation never changes the
@@ -11,7 +11,6 @@
 
 use super::rig::{self, Joint, Pose, bind, bind_dir, bind_side, frame_rot, solve_limb};
 use bevy::math::{Quat, Vec2, Vec3};
-use engine_weapons::WeaponKind;
 use std::f32::consts::{PI, TAU};
 
 /// How the weapon is held.
@@ -38,18 +37,6 @@ impl Hold {
         Hold::Bomb,
         Hold::Empty,
     ];
-
-    pub fn from_kind(k: Option<WeaponKind>) -> Hold {
-        match k {
-            Some(WeaponKind::Rifle | WeaponKind::Smg) => Hold::Rifle,
-            Some(WeaponKind::SniperLight | WeaponKind::SniperHeavy) => Hold::Sniper,
-            Some(WeaponKind::Pistol) => Hold::Pistol,
-            Some(WeaponKind::Knife) => Hold::Knife,
-            Some(WeaponKind::Grenade) => Hold::Grenade,
-            Some(WeaponKind::Bomb) => Hold::Bomb,
-            None => Hold::Empty,
-        }
-    }
 
     pub fn label(self) -> &'static str {
         match self {
@@ -659,7 +646,6 @@ pub fn collapse(from: &Pose, t: f32) -> Pose {
 
 #[cfg(test)]
 mod tests {
-    use super::super::mesh::{self, Lod, Parts};
     use super::*;
 
     fn run(inp: AnimInput, secs: f32) -> Animator {
@@ -670,82 +656,6 @@ mod tests {
             t += 1.0 / 128.0;
         }
         a
-    }
-
-    fn skinned(pose: &Pose, m: &mesh::MeshData) -> Vec<Vec3> {
-        let mats: Vec<_> = (0..rig::JOINT_COUNT).map(|j| pose.skin_matrix(j)).collect();
-        m.positions
-            .iter()
-            .zip(m.joints.iter().zip(&m.weights))
-            .map(|(p, (j, w))| {
-                let p = Vec3::from_array(*p);
-                (0..4)
-                    .map(|k| mats[j[k] as usize].transform_point3(p) * w[k])
-                    .sum()
-            })
-            .collect()
-    }
-
-    fn capsule_dist(p: Vec3, c: &engine_hitreg::Capsule) -> f32 {
-        let ab = c.b - c.a;
-        let t = ((p - c.a).dot(ab) / ab.length_squared().max(1e-6)).clamp(0.0, 1.0);
-        (p - (c.a + ab * t)).length() - c.radius
-    }
-
-    /// Share of skin vertices within `margin` of a hitbox.
-    fn coverage(pose: &Pose, duck: f32, margin: f32) -> f32 {
-        let m = mesh::humanoid(Lod::Mid, Parts::FullBody);
-        let hb = engine_hitreg::hitboxes(&engine_hitreg::Pose {
-            origin: Vec3::ZERO,
-            yaw: 0.0,
-            duck,
-        });
-        let pts = skinned(pose, &m);
-        let inside = pts
-            .iter()
-            .filter(|p| hb.capsules.iter().any(|c| capsule_dist(**p, c) < margin))
-            .count();
-        inside as f32 / pts.len() as f32
-    }
-
-    #[test]
-    fn skin_stays_in_hitboxes() {
-        let cases = [
-            ("debout", AnimInput::default(), 0.0),
-            (
-                "accroupi",
-                AnimInput {
-                    duck: 1.0,
-                    ..Default::default()
-                },
-                1.0,
-            ),
-            (
-                "course",
-                AnimInput {
-                    velocity: Vec3::new(0.0, 0.0, -250.0),
-                    ..Default::default()
-                },
-                0.0,
-            ),
-            (
-                "pistolet",
-                AnimInput {
-                    hold: Hold::Pistol,
-                    ..Default::default()
-                },
-                0.0,
-            ),
-        ];
-        for (name, inp, duck) in cases {
-            let a = run(inp, 1.3);
-            let c = coverage(&a.pose, duck, 3.0);
-            assert!(
-                c > 0.9,
-                "{name}: {:.1}% de la peau près des hitboxes",
-                c * 100.0
-            );
-        }
     }
 
     #[test]

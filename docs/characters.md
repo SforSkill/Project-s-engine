@@ -1,13 +1,13 @@
 # Personnages « peinture liquide »
 
 Les cubes des joueurs sont remplacés par des humanoïdes low-poly à facettes. Leur
-matériau imite une peinture liquide. Tout est dans `crates/game-client/src/character/`.
+matériau imite une peinture liquide. Tout est dans `crates/ps-client/src/character/`.
 La décision et ses compromis sont décrits dans
-[ADR 0005](decisions/0005-liquid-characters.md).
+[ADR 0005](https://github.com/SforSkill/Project-s-docs/blob/main/docs/decisions/0005-liquid-characters.md).
 
 ## Garanties compétitives
 
-- **Hitboxes inchangées** : `engine-hitreg` les calcule à partir de la pose
+- **Hitboxes inchangées** : `ps-hitreg` les calcule à partir de la pose
   réseau (`origin`, `yaw`, `duck`). Le modèle visuel n'en lit rien et n'y écrit
   rien.
 - **Effets purement locaux** : les gouttes et les flaques n'ont ni collision ni
